@@ -101,7 +101,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintOptions"
             android:layout_width="match_parent"
-            android:layout_height="209dp"
+            android:layout_height="293dp"
             android:layout_marginTop="16dp"
             app:layout_constraintStart_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -111,8 +111,9 @@
                 android:layout_width="181dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent">
+                android:layout_marginTop="16dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txtArea">
 
                 <RadioButton
                     android:id="@+id/radioSistemas"
@@ -136,10 +137,11 @@
             <LinearLayout
                 android:layout_width="175dp"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
                 android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txtLanguage">
 
                 <CheckBox
                     android:id="@+id/ckEspanol"
@@ -164,6 +166,18 @@
                     android:text="Chino"
                     app:layout_constraintTop_toBottomOf="@+id/ckEspanol"
                     tools:layout_editor_absoluteX="232dp" />
+
+                <CheckBox
+                    android:id="@+id/ckFrancés"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Francés" />
+
+                <CheckBox
+                    android:id="@+id/ckAleman"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Aleman" />
 
             </LinearLayout>
 

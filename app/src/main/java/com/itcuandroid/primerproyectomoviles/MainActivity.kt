@@ -1,6 +1,7 @@
 package com.itcuandroid.primerproyectomoviles
 
 import android.os.Bundle
+import android.text.InputType
 import android.util.Log
 import android.view.View
 import android.widget.CheckBox
@@ -34,6 +35,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var  checkEspanol: CheckBox
     private lateinit var  checkIngles: CheckBox
     private lateinit var  checkChino: CheckBox
+    private lateinit var  checkFrances: CheckBox
+    private lateinit var  checkAleman: CheckBox
 
     //RecyclerView
     private lateinit var recyclerLanguages: RecyclerView
@@ -49,7 +52,11 @@ class MainActivity : AppCompatActivity() {
 
 
         txtEditName=findViewById(R.id.userName)
+        txtEditName.setInputType(InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES)
+
         txtEditLastName=findViewById(R.id.userLastName)
+        txtEditLastName.setInputType(InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES)
+
         txtEditEmail=findViewById(R.id.userEmail)
 
         radioSistemas= findViewById(R.id.radioSistemas)
@@ -63,10 +70,14 @@ class MainActivity : AppCompatActivity() {
         checkEspanol= findViewById(R.id.ckEspanol)
         checkIngles= findViewById(R.id.ckIngles)
         checkChino= findViewById(R.id.ckChino)
+        checkFrances= findViewById(R.id.ckFrancés)
+        checkAleman= findViewById(R.id.ckAleman)
 
         checkEspanol.setOnCheckedChangeListener(changeChecked)
         checkIngles.setOnCheckedChangeListener(changeChecked)
         checkChino.setOnCheckedChangeListener(changeChecked)
+        checkAleman.setOnCheckedChangeListener(changeChecked)
+        checkFrances.setOnCheckedChangeListener(changeChecked)
 
         recyclerLanguages=findViewById(R.id.recycler_languages)
         recyclerLanguages.layoutManager=LinearLayoutManager(
@@ -129,6 +140,24 @@ class MainActivity : AppCompatActivity() {
                 Language(
                     title = "Chino",
                     image = R.drawable.ic_lengua_china
+                )
+            )
+        }
+
+        if(checkFrances.isChecked){
+            languages.add(
+                Language(
+                    title = "Francés",
+                    image = R.drawable.ic_francia
+                )
+            )
+        }
+
+        if(checkAleman.isChecked){
+            languages.add(
+                Language(
+                    title = "Aleman",
+                    image = R.drawable.ic_alemania
                 )
             )
         }
