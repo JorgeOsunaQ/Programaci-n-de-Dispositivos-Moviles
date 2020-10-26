@@ -1,4 +1,4 @@
-package com.itcuandroid.primerproyectomoviles
+package com.itcuandroid.primerproyectomoviles.views
 
 import android.os.Bundle
 import android.text.InputType
@@ -12,6 +12,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.itcuandroid.primerproyectomoviles.models.entities.Language
+import com.itcuandroid.primerproyectomoviles.R
+import com.itcuandroid.primerproyectomoviles.adapters.AdapterLanguages
 
 
 class MainActivity : AppCompatActivity() {
@@ -53,6 +56,7 @@ class MainActivity : AppCompatActivity() {
 
         txtEditLastName=findViewById(R.id.userLastName)
         txtEditLastName.setInputType(InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES)
+
         txtEditEmail=findViewById(R.id.userEmail)
 
         radioSistemas= findViewById(R.id.radioSistemas)
@@ -74,7 +78,7 @@ class MainActivity : AppCompatActivity() {
         recyclerLanguages=findViewById(R.id.recycler_languages)
         recyclerLanguages.layoutManager=LinearLayoutManager(
             this,
-            LinearLayoutManager.VERTICAL,
+            LinearLayoutManager.HORIZONTAL,
             false
         )
 
@@ -110,34 +114,34 @@ class MainActivity : AppCompatActivity() {
         selectedLanguages.clear()
 
         if(checkEspanol.isChecked){
-            languages.add(
-                Language(
-                    title = "Español",
-                    image = R.drawable.ic_lengua_espanola
-                )
-            )
+//            languages.add(
+//                Language(
+//                    title = "Español",
+//                    image = R.drawable.ic_lengua_espanola
+//                )
+//            )
         }
 
         if(checkIngles.isChecked){
-            languages.add(
-                Language(
-                    title = "Inglés",
-                    image = R.drawable.ic_lengua_inglesa
-                )
-            )
+//            languages.add(
+//                Language(
+//                    title = "Inglés",
+//                    image = R.drawable.ic_lengua_inglesa
+//                )
+//            )
         }
 
         if(checkChino.isChecked){
-            languages.add(
-                Language(
-                    title = "Chino",
-                    image = R.drawable.ic_lengua_china
-                )
-            )
+//            languages.add(
+//                Language(
+//                    title = "Chino",
+//                    image = R.drawable.ic_lengua_china
+//                )
+//            )
         }
 
         selectedLanguages=languages
-        var adapterLanguage=AdapterLanguages(selectedLanguages)
+        var adapterLanguage= AdapterLanguages(selectedLanguages)
         recyclerLanguages.adapter=adapterLanguage
     }
 

@@ -1,11 +1,11 @@
-package com.itcuandroid.primerproyectomoviles
+package com.itcuandroid.primerproyectomoviles.views
 
 import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
-import android.util.Log
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
+import com.itcuandroid.primerproyectomoviles.R
 
 class InfoDialog: DialogFragment() {
 
