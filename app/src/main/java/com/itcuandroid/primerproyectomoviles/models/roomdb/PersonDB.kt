@@ -8,21 +8,21 @@ import com.itcuandroid.primerproyectomoviles.R
 import com.itcuandroid.primerproyectomoviles.models.dao.DepartmentDAO
 import com.itcuandroid.primerproyectomoviles.models.dao.LanguageDAO
 import com.itcuandroid.primerproyectomoviles.models.dao.PersonDAO
-import com.itcuandroid.primerproyectomoviles.models.entities.Department
-import com.itcuandroid.primerproyectomoviles.models.entities.Language
-import com.itcuandroid.primerproyectomoviles.models.entities.Person
+import com.itcuandroid.primerproyectomoviles.models.dao.PersonLanguageDAO
+import com.itcuandroid.primerproyectomoviles.models.entities.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Database(
-    entities = [Department::class, Language::class, Person::class],
+    entities = [Department::class, Language::class, Person::class, PersonLanguage::class],
     version = 1,
     exportSchema = true)
 abstract class PersonDB : RoomDatabase() {
     abstract  fun departmentDao(): DepartmentDAO
     abstract  fun languageDAO(): LanguageDAO
     abstract  fun personDAO(): PersonDAO
+    abstract  fun personLanguageDAO(): PersonLanguageDAO
 
 
     companion object {
@@ -77,14 +77,72 @@ abstract class PersonDB : RoomDatabase() {
                     image = R.drawable.ic_lengua_china
                 )
             )
+
+
+            languageDAO.insertLanguage(
+                Language(
+                    4,
+                    title = "Fránces",
+                    image = R.drawable.ic_francia
+                )
+            )
+
+
+            languageDAO.insertLanguage(
+                Language(
+                    5,
+                    title = "Aleman",
+                    image = R.drawable.ic_alemania
+                )
+            )
         }
 
         if(depaDAO.getAllDepartments().isEmpty()){
 
+            depaDAO.insertDepartment(
+                Department(
+                    1,
+                    nameDepart = "Sistemas"
+                )
+            )
+
+            depaDAO.insertDepartment(
+                Department(
+                    2,
+                    nameDepart = "Administrativo"
+                )
+            )
+
+            depaDAO.insertDepartment(
+                Department(
+                    3,
+                    nameDepart = "Ventas"
+                )
+            )
+
         }
 
         if(personDAO.getAllPersonsSync().isEmpty()){
+            val idP1=personDAO.insertPerson(
+                Person(
+                    name="Jorge",
+                    lastName = "Osuna Quintana",
+                    email = "jorgeosunaqui@gmail.com",
+                    idDepartment = 1
+                )
+            )
 
+            val idP2=personDAO.insertPerson(
+                Person(
+                    name="Carlos Iván",
+                    lastName = "Osuna Quintana",
+                    email = "correoTest@gmail.com",
+                    idDepartment = 1
+                )
+            )
+
+            val languagesPerson= listOf(PersonLanguage(idP1,1), PersonLanguage(idP1,2),PersonLanguage(idP2,1))
+            personLanguageDAO().insertPersonLanguages(languagesPerson)
         }
 
 

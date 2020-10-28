@@ -16,4 +16,9 @@ class DepartmentRepository(context:Context) {
         return departmentDAO.getAllDepartments()
     }
 
+    suspend fun getDepartmentById(id:Long):  Department {
+        return departmentDAO.getDepartmentById(id)
+    }
+
+
 }

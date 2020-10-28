@@ -16,5 +16,6 @@ interface DepartmentDAO {
     @Query("SELECT * FROM Department")
     suspend fun getAllDepartments() : List<Department>
 
-
+    @Query("SELECT * FROM Department where id=:id")
+    suspend fun getDepartmentById(id:Long) : Department
 }

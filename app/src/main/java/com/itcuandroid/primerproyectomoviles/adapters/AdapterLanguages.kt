@@ -14,7 +14,7 @@ class AdapterLanguages(private val languajes: List<Language>): RecyclerView.Adap
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LanguajesHolder {
         val layoutInflater=LayoutInflater.from(parent.context)
         val view= layoutInflater.inflate(R.layout.card_languages,parent,false)
-        view.layoutParams = ViewGroup.LayoutParams((parent.width * 0.3333).toInt(),ViewGroup.LayoutParams.MATCH_PARENT)
+        view.layoutParams = ViewGroup.LayoutParams((parent.width * 0.5).toInt(),ViewGroup.LayoutParams.MATCH_PARENT)
 
         return LanguajesHolder(view)
     }

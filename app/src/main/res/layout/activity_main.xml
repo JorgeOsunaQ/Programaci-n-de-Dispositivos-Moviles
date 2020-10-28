@@ -101,9 +101,9 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintOptions"
             android:layout_width="match_parent"
-            android:layout_height="209dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            app:layout_constraintStart_toEndOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/userEmail">
 
@@ -111,8 +111,10 @@
                 android:layout_width="181dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent">
+                android:layout_marginTop="16dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txtArea"
+                android:id="@+id/radioGroupDepa">
 
                 <RadioButton
                     android:id="@+id/radioSistemas"
@@ -138,7 +140,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
                 android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/txtLanguage"
                 app:layout_constraintEnd_toEndOf="parent">
 
                 <CheckBox
@@ -162,6 +164,22 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Chino"
+                    app:layout_constraintTop_toBottomOf="@+id/ckEspanol"
+                    tools:layout_editor_absoluteX="232dp" />
+
+                <CheckBox
+                    android:id="@+id/ckFrances"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Francés"
+                    app:layout_constraintTop_toBottomOf="@+id/ckEspanol"
+                    tools:layout_editor_absoluteX="232dp" />
+
+                <CheckBox
+                    android:id="@+id/ckAleman"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Aleman"
                     app:layout_constraintTop_toBottomOf="@+id/ckEspanol"
                     tools:layout_editor_absoluteX="232dp" />
 
@@ -202,24 +220,35 @@
             android:layout_height="match_parent"
             android:layout_marginTop="16dp"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/constraintOptions" />
-
-
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fltBtnSend"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
+            android:layout_marginTop="16dp"
             android:layout_marginEnd="28dp"
             android:layout_marginBottom="24dp"
             android:clickable="true"
             app:backgroundTint="@color/Floating"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/recycler_languages"
+            app:layout_constraintTop_toBottomOf="@+id/fltBtnSearch"
             app:srcCompat="@drawable/ic_done_24px" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fltBtnSearch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="28dp"
+            android:clickable="true"
+            app:backgroundTint="@color/FloatingSearch"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/recycler_languages"
+            app:srcCompat="@android:drawable/ic_menu_search" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

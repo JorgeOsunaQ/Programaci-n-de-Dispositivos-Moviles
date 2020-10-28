@@ -5,8 +5,7 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class Language (
-    @PrimaryKey()
-    val id: Long,
+    @PrimaryKey  val idLanguage: Long,
     val title:String,
     val image: Int,
 )

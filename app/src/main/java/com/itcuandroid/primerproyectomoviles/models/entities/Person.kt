@@ -2,6 +2,7 @@ package com.itcuandroid.primerproyectomoviles.models.entities
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(foreignKeys =
@@ -12,16 +13,16 @@ import androidx.room.PrimaryKey
             childColumns = ["idDepartment"],
             onDelete = ForeignKey.NO_ACTION
         )
-    ]
+    ],
+    indices = [Index(value = ["idDepartment"])]
 
 )
 data class Person (
     @PrimaryKey(autoGenerate = true)
-    val id: Long?=null,
+    val idPerson: Long?=null,
     val name: String,
     val lastName: String,
     val email: String,
-    val idLanguage: Long,
     val idDepartment: Long
 ){
     var fullName = "$name $lastName"

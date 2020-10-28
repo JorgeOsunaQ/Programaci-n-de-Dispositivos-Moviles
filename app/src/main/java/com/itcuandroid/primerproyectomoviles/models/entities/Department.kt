@@ -1,11 +1,12 @@
 package com.itcuandroid.primerproyectomoviles.models.entities
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity
 data class Department (
-    @PrimaryKey()
+    @PrimaryKey
     val id: Long,
     val nameDepart: String
 )

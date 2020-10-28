@@ -4,7 +4,10 @@ import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Transaction
 import com.itcuandroid.primerproyectomoviles.models.entities.Person
+import com.itcuandroid.primerproyectomoviles.models.entities.PersonWithLanguages
+import com.itcuandroid.primerproyectomoviles.models.entities.PersonWithLanguagesAndDepartment
 
 @Dao
 interface PersonDAO {
@@ -12,25 +15,13 @@ interface PersonDAO {
     @Insert
     suspend fun insertPerson(person: Person): Long
 
-    @Query(
-        "SELECT p.*, l.title as nbIdioma, l.image, p.nameDepart as nbDepa " +
-                "FROM Person p" +
-                "Inner Join Language l On l.id=p.idLanguage" +
-                "Inner Join Department d On d.id=p.idDepartment"
-    )
-    fun getAllPersons() : LiveData<List<PersonData>>
+    @Query("SELECT * FROM Person")
+    fun getAllPersons() : LiveData<List<Person>>
+
+    @Transaction
+    @Query("SELECT * FROM Person")
+    fun getPersonsWithLanguagesAndDepartments(): LiveData<List<PersonWithLanguagesAndDepartment>>
 
     @Query("SELECT * FROM Person")
     suspend fun getAllPersonsSync(): List<Person>
-
-    data class PersonData (
-        val id : Long,
-        val lastName: String,
-        val email: String,
-        val idDepartment: Long,
-        val nbIdioma: String,
-        val image: Int,
-        val nbDepa: String
-    )
-
 }

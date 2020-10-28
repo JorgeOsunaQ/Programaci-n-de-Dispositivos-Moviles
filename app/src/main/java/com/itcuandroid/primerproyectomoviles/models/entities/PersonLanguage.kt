@@ -2,24 +2,25 @@ package com.itcuandroid.primerproyectomoviles.models.entities
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
-
 
 @Entity(
     primaryKeys = [
-        "idPerson", "idDepartment"
+        "idPerson", "idLanguage"
     ],
+    indices = [Index(value = ["idLanguage","idPerson"])],
     foreignKeys =
     [
         ForeignKey(
-            entity = Department::class,
-            parentColumns = ["id"],
-            childColumns = ["idDepartment"],
+            entity = Language::class,
+            parentColumns = ["idLanguage"],
+            childColumns = ["idLanguage"],
             onDelete = ForeignKey.NO_ACTION
         ),
         ForeignKey(
             entity = Person::class,
-            parentColumns = ["id"],
+            parentColumns = ["idPerson"],
             childColumns = ["idPerson"],
             onDelete = ForeignKey.NO_ACTION
         )
@@ -27,11 +28,11 @@ import androidx.room.PrimaryKey
 
 )
 data class PersonLanguage (
-    @PrimaryKey(autoGenerate = true)
-    val id: Long?=null,
     val idPerson: Long,
-    val idDepartment: Long
+    val idLanguage: Long
 ){
+
+
 
 }
 
