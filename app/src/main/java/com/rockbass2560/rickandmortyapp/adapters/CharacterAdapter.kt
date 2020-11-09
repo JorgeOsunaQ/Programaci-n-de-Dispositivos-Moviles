@@ -12,18 +12,16 @@ import com.rockbass2560.rickandmortyapp.models.Results
 
 class CharacterAdapter : RecyclerView.Adapter<CharacterAdapter.CharacterViewHolder>() {
 
-    private val listCharacters = mutableListOf<Results>()
+    private val listCharacters = mutableListOf<CharacterView>()
 
-    public fun addResults(characterPageRequest: CharacterPageRequest) {
-        val results = characterPageRequest.results;
-
-        listCharacters.addAll(results);
+    public fun addResults(data: List<CharacterView>) {
+        listCharacters.addAll(data);
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CharacterViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context);
-        val view = layoutInflater.inflate(R.layout.card_character, parent, false);
-        return CharacterViewHolder(view);
+        val cardDataBinding = CardCharacterBinding.inflate(layoutInflater, parent, false)
+        return CharacterViewHolder(cardDataBinding);
     }
 
     override fun onBindViewHolder(holder: CharacterViewHolder, position: Int) {
@@ -35,19 +33,12 @@ class CharacterAdapter : RecyclerView.Adapter<CharacterAdapter.CharacterViewHold
         return listCharacters.size;
     }
 
-    inner class CharacterViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    inner class CharacterViewHolder(private val cardCharacterBinding: CardCharacterBinding)
+        : RecyclerView.ViewHolder(cardCharacterBinding.root) {
 
-        fun onBind(result: Results) {
-            val cardCharacterBinding = CardCharacterBinding.bind(itemView)
-
-            cardCharacterBinding.character = CharacterView(
-                result.image,
-                result.name,
-                result.status,
-                result.species,
-                result.location.name,
-                result.episode.first()
-            );
+        fun onBind(characterView: CharacterView) {
+            cardCharacterBinding.character = characterView
+            cardCharacterBinding.executePendingBindings()
         }
 
     }
