@@ -13,15 +13,17 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
 
     private val rickAndMortyRepository = RickAndMortyRepository();
     val rickAndMortyListLiveData = MutableLiveData<List<CharacterView>>()
-    private val rickAndMortyList = mutableListOf<CharacterView>()
     private var page = 0;
+    private var isLoadingCharacters = false
+    var hasNextCharacters = true
 
     fun getCharacters() {
-        page++;
-        viewModelScope.launch {
-            val characterPageRequest = rickAndMortyRepository.getPage(page)
-            rickAndMortyList.addAll(
-                characterPageRequest.results.map { result ->
+        if (!isLoadingCharacters && hasNextCharacters) {
+            isLoadingCharacters = true
+            page++;
+            viewModelScope.launch {
+                val characterPageRequest = rickAndMortyRepository.getPage(page)
+                val listCharactersView = characterPageRequest.results.map { result ->
                     CharacterView(
                         result.image,
                         result.name,
@@ -31,9 +33,12 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
                         rickAndMortyRepository.getEpisodeByUrl(result.episode.first()).name
                     )
                 }
-            )
 
-            rickAndMortyListLiveData.postValue(rickAndMortyList)
+                rickAndMortyListLiveData.postValue(listCharactersView)
+
+                hasNextCharacters = characterPageRequest.info.next.isNotEmpty()
+                isLoadingCharacters = false
+            }
         }
     }
 

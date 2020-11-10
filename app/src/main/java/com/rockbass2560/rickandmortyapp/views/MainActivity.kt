@@ -13,9 +13,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.rockbass2560.rickandmortyapp.R
 import com.rockbass2560.rickandmortyapp.adapters.CharacterAdapter
+import com.rockbass2560.rickandmortyapp.listeners.OnBottomReachedListener
 import com.rockbass2560.rickandmortyapp.models.CharacterView
 import com.rockbass2560.rickandmortyapp.viewmodels.MainActivityViewModel
-import kotlinx.android.synthetic.main.activity_main.*
 
 @BindingAdapter("imageUrl")
 fun loadImage(view: ImageView, url: String) {
@@ -46,7 +46,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val reyclerViewData = findViewById<RecyclerView>(R.id.recyclerViewData)
+        val recyclerViewData = findViewById<RecyclerView>(R.id.recyclerViewData)
         val characterAdapter = CharacterAdapter()
 
         recyclerViewData.layoutManager = LinearLayoutManager(this)
@@ -54,9 +54,15 @@ class MainActivity : AppCompatActivity() {
 
         mainActivityViewModel.rickAndMortyListLiveData.observe(this,
             Observer<List<CharacterView>> {
-                characterAdapter.addResults(it)
+                characterAdapter.addResults(it, mainActivityViewModel.hasNextCharacters)
                 characterAdapter.notifyDataSetChanged()
             })
+
+        characterAdapter.setOnBottomReachedListener(object: OnBottomReachedListener {
+            override fun onBottomReached() {
+                mainActivityViewModel.getCharacters()
+            }
+        })
 
         mainActivityViewModel.getCharacters()
     }
