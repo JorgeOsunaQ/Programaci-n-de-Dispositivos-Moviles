@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">RickAndMortyApp</string>
     <string name="status_and_species">%s %s</string>
+    <string name="episode_link"><u>%s</u></string>
 </resources>
