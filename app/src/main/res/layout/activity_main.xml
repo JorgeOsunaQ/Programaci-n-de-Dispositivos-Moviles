@@ -16,6 +16,7 @@
         android:text="The Rick And Morty APP"
         android:gravity="center"
         android:textSize="30sp"
+        android:textColor="@color/colorCardGray"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

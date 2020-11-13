@@ -3,6 +3,7 @@ package com.itcuandroid.rickandmorty.views
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.BindingAdapter
@@ -17,11 +18,16 @@ import com.itcuandroid.rickandmorty.databinding.ActivityInfoEpisodeBinding
 import com.itcuandroid.rickandmorty.models.Episode
 import com.itcuandroid.rickandmorty.models.Results
 import com.itcuandroid.rickandmorty.viewmodels.InfoEpisodeActivityViewModel
+import kotlinx.android.synthetic.main.activity_info_episode.view.*
 import java.net.URI
 
 @BindingAdapter("android:tempEpisode")
-fun setTempText(view: View, text: String?) {
+fun setTempText(view: TextView, text: String?) {
     Log.d("TextDATA",text.toString())
+
+    var labelTemp= getTempText(text);
+
+    view.text=labelTemp;
 }
 
 class InfoEpisodeActivity : AppCompatActivity() {
@@ -70,24 +76,34 @@ class InfoEpisodeActivity : AppCompatActivity() {
 
             characters.add(idCharacter);
         }
-        main();
         infoEpisodeActivityViewModel.getCharactersEpisode(characters);
     }
 
-    fun main() {
+}
 
-        val text = "S01E05"
-        val pattern = Regex(pattern = "\\d+")
+fun getTempText(tempTex: String?): String {
 
-        val matches = pattern.findAll(text)
+    if(tempTex==null)
+        return "";
 
-        Log.d("REGEX","Inicia Regex")
-        Log.d("REGEX",matches.toString())
-        matches.forEach { f ->
-            val m = f.value
-            val idx = f.range
-            Log.d("REGEX","$m found at indexes: $idx")
-        }
+    val pattern = Regex(pattern = "\\d+");
+    val matches = pattern.findAll(tempTex);
+
+    var temp="";
+    var episode="";
+
+    Log.d("REGEX","Inicia Regex")
+    Log.d("REGEX",matches.toString())
+    matches.forEachIndexed { index, f ->
+        val m = f.value
+        val idx = f.range
+        Log.d("REGEX","$m found at indexes: $idx")
+
+        if(index==0)
+            temp=f.value;
+        else
+            episode=f.value
     }
 
+    return "Temporada ${temp}, Episodio ${episode}";
 }

@@ -24,8 +24,8 @@ class CharacterAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var onBottomReachedListener: OnBottomReachedListener? = null
 
 
-    fun addResults(listCharacters: List<CharacterView>, hasNextCharacters: Boolean){
-        this.listCharacters.addAll(listCharacters);
+    fun addResults(data: List<CharacterView>, hasNextCharacters: Boolean){
+        this.listCharacters.addAll(data);
         this.hasNextCharacters = hasNextCharacters
     }
 
@@ -48,11 +48,7 @@ class CharacterAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             val cardDataBinding = CardCharacterBinding.inflate(layoutInflater, parent, false)
             return CharacterViewHolder(cardDataBinding)
         } else {
-            val circularLoading = layoutInflater.inflate(
-                R.layout.circular_loading_characters,
-                parent,
-                false
-            )
+            val circularLoading = layoutInflater.inflate(R.layout.circular_loading_characters, parent, false)
             return CircularLoadingViewHolder(circularLoading)
         }
     }
@@ -67,7 +63,8 @@ class CharacterAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     override fun getItemCount(): Int {
-        return listCharacters.size;
+        val increaseSize = if (hasNextCharacters) 1 else 0
+        return listCharacters.size + increaseSize;
     }
 
     inner class CircularLoadingViewHolder(view: View) : RecyclerView.ViewHolder(view) { }
