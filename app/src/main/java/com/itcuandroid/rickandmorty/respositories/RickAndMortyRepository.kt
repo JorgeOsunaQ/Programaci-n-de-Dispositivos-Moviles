@@ -1,7 +1,11 @@
 package com.itcuandroid.rickandmorty.respositories
 
+import android.text.TextUtils
+import android.util.Log
 import com.itcuandroid.rickandmorty.models.CharacterPageRequest
+import com.itcuandroid.rickandmorty.models.CharacterView
 import com.itcuandroid.rickandmorty.models.Episode
+import com.itcuandroid.rickandmorty.models.Results
 import com.itcuandroid.rickandmorty.net.RetrofitInstance
 import retrofit2.Call
 import retrofit2.Callback
@@ -48,8 +52,23 @@ class RickAndMortyRepository {
                     it.resumeWithException(t);
                 }
 
-            }
-        )
+            })
     }
+
+    suspend fun getCharactersById(characters: String)= suspendCoroutine<List<Results>> {
+
+
+        RetrofitInstance.rickAndMortService.getCharacterById(characters).enqueue(object: Callback<List<Results>>{
+                override fun onResponse( call: Call<List<Results>>, response: Response<List<Results>>) {
+                    return it.resume(response.body()!!);
+                }
+
+                override fun onFailure(call: Call<List<Results>>, t: Throwable) {
+                    return it.resumeWithException(t);
+                }
+
+            })
+    }
+
 
 }

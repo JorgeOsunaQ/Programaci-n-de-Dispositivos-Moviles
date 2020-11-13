@@ -2,4 +2,5 @@
     <string name="app_name">RickAndMortyApp</string>
     <string name="status_and_species">%s %s</string>
     <string name="episode_link"><u>%s</u></string>
+    <string name="episode_temp">Temporada <b>%s</b>, Episodio <b>#%s</b> </string>
 </resources>

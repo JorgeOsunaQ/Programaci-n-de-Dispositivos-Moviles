@@ -7,5 +7,5 @@ data class CharacterView (
     var specie: String,
     var location: String,
     var firstSeen: String,
-    var episodeUrl: String
+    var episodeUrl: String? = null
 )

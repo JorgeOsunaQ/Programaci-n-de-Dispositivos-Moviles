@@ -19,32 +19,37 @@ class MainActivityViewModel(application: Application): AndroidViewModel(applicat
     var hasNextCharacters = true
 
     fun getCharacters(){
-        page++;
-        viewModelScope.launch {
-            val characterPageRequest = rickAndMortyRepository.getPage(page);
 
-            rickAndMortyList.addAll(
-                characterPageRequest.results.map { result ->
+        if (!isLoadingCharacters && hasNextCharacters) {
+            isLoadingCharacters = true;
+            page++;
+            viewModelScope.launch {
+                val characterPageRequest = rickAndMortyRepository.getPage(page);
 
-                    var firsEpisodeSeen= rickAndMortyRepository.getEpisodesByUrl(result.episode.first());
+                rickAndMortyList.addAll(
+                    characterPageRequest.results.map { result ->
 
-                    CharacterView(
-                        result.image,
-                        result.name,
-                        result.status,
-                        result.species,
-                        result.location.name,
-                        firsEpisodeSeen.name,
-                        firsEpisodeSeen.url
-                    )
-                }
-            )
+                        var firsEpisodeSeen =
+                            rickAndMortyRepository.getEpisodesByUrl(result.episode.first());
 
-            rickAndMortyLiveData.postValue(rickAndMortyList);
+                        CharacterView(
+                            result.image,
+                            result.name,
+                            result.status,
+                            result.species,
+                            result.location.name,
+                            firsEpisodeSeen.name,
+                            firsEpisodeSeen.url
+                        )
+                    }
+                )
+
+                rickAndMortyLiveData.postValue(rickAndMortyList);
 
 
-            hasNextCharacters = characterPageRequest.info.next.isNotEmpty()
-            isLoadingCharacters = false
+                hasNextCharacters = characterPageRequest.info.next.isNotEmpty()
+                isLoadingCharacters = false
+            }
         }
     }
 
