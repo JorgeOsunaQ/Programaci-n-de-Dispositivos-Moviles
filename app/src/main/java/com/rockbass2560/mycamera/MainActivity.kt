@@ -3,32 +3,52 @@ package com.rockbass2560.mycamera
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
-import android.hardware.camera2.CameraCaptureSession
-import android.hardware.camera2.CameraDevice
-import android.hardware.camera2.CameraManager
+import android.graphics.ImageFormat
+import android.hardware.camera2.*
 import android.hardware.camera2.params.OutputConfiguration
 import android.hardware.camera2.params.SessionConfiguration
+import android.media.ImageReader
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Size
 import android.view.SurfaceHolder
 import android.view.SurfaceView
-import android.view.View
+import android.widget.Button
+import android.widget.ImageButton
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import java.io.File
 import java.util.concurrent.Executors
 
 class MainActivity : AppCompatActivity() {
     private val REQUEST_CAMERA = 10
     private val executorCamera = Executors.newSingleThreadExecutor()
+    private lateinit var session: CameraCaptureSession
+    private lateinit var surfaceHolder: SurfaceHolder
+    private lateinit var cameraDevice: CameraDevice
+    private var activeCamera = 0
+    private lateinit var folderImage: File
+    private var imageCapture: CaptureRequest? = null
+    private lateinit var imageReader: ImageReader
+    private lateinit var cameraManager: CameraManager
+    private var reOpenToggle = true
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         if (requestCode == REQUEST_CAMERA) {
             if (grantResults.contains(PackageManager.PERMISSION_GRANTED)) {
-                configCamera()
+                firstConfigCamera()
             } else {
-                Toast.makeText(this, "Es necesario aceptar el permiso de la camara para este ejercicio", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    this,
+                    "Es necesario aceptar el permiso de la camara para este ejercicio",
+                    Toast.LENGTH_LONG
+                ).show()
             }
         }
     }
@@ -37,75 +57,182 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-            configCamera()
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.CAMERA
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            firstConfigCamera()
         } else {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), REQUEST_CAMERA)
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.CAMERA),
+                REQUEST_CAMERA
+            )
+        }
+
+        createFolderImage()
+
+        configButtons()
+    }
+
+    fun createFolderImage() {
+        folderImage = File(filesDir, "image")
+        if (!folderImage.exists()) {
+            folderImage.mkdir()
+        }
+    }
+
+    fun configButtons() {
+        val flipButton = findViewById<ImageButton>(R.id.flip_button)
+        flipButton.setOnClickListener {
+            session.stopRepeating()
+            imageReader.close()
+            cameraDevice.close()
+        }
+
+        val buttonTakePhoto = findViewById<Button>(R.id.button_takephoto)
+        buttonTakePhoto.setOnClickListener {
+            imageCapture?.let {
+                session.capture(it, null, null)
+            }
         }
     }
 
     @SuppressLint("MissingPermission")
-    fun configCamera() {
+    fun firstConfigCamera() {
         val surfacePreview = findViewById<SurfaceView>(R.id.surface_preview)
 
-        surfacePreview.holder.addCallback(object: SurfaceHolder.Callback {
+        surfacePreview.holder.addCallback(object : SurfaceHolder.Callback {
             override fun surfaceCreated(holder: SurfaceHolder) {
 
-                val cameraManager = getSystemService(CAMERA_SERVICE) as CameraManager
+                surfaceHolder = holder
 
-                cameraManager.openCamera(cameraManager.cameraIdList.first(),
-                    object: CameraDevice.StateCallback() {
-                        override fun onOpened(camera: CameraDevice) {
-                            val builderCapture  = camera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
-                            builderCapture.addTarget(holder.surface)
+                cameraManager = getSystemService(CAMERA_SERVICE) as CameraManager
 
-                            val captureRequest = builderCapture.build()
+                val idCamera = cameraManager.cameraIdList[activeCamera]
 
-                            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
-                                camera.createCaptureSession(
-                                    listOf(holder.surface),
-                                    object: CameraCaptureSession.StateCallback() {
-                                        override fun onConfigured(session: CameraCaptureSession) {
-                                            session.setRepeatingRequest(captureRequest, null, null)
-                                        }
+                createImageReader(idCamera)
 
-                                        override fun onConfigureFailed(session: CameraCaptureSession) { }
-
-                                    },
-                                    null
-                                )
-                            } else {
-                                val sessionConfiguration = SessionConfiguration(
-                                    SessionConfiguration.SESSION_REGULAR,
-                                    listOf(
-                                        OutputConfiguration(holder.surface)
-                                    ),
-                                    executorCamera,
-                                    object: CameraCaptureSession.StateCallback() {
-                                        override fun onConfigured(session: CameraCaptureSession) {
-                                            session.setRepeatingRequest(captureRequest, null, null)
-                                        }
-
-                                        override fun onConfigureFailed(session: CameraCaptureSession) { }
-
-                                    }
-                                )
-
-                                camera.createCaptureSession(sessionConfiguration)
-                            }
-                        }
-
-                        override fun onDisconnected(camera: CameraDevice) { }
-
-                        override fun onError(camera: CameraDevice, error: Int) { }
-
-                    }, null)
+                cameraManager.openCamera(idCamera, cameraDeviceCallBack, null)
             }
 
-            override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) { }
+            override fun surfaceChanged(
+                holder: SurfaceHolder,
+                format: Int,
+                width: Int,
+                height: Int
+            ) {
+            }
 
-            override fun surfaceDestroyed(holder: SurfaceHolder) { }
+            override fun surfaceDestroyed(holder: SurfaceHolder) {}
 
         })
+    }
+
+    fun createImageReader(idCamera: String) {
+        val size = getSize(idCamera)
+
+        configImageReader(size)
+    }
+
+    fun getSize(idCamera: String): Size {
+        val cameraCharacteristics = cameraManager.getCameraCharacteristics(idCamera)
+        val scalerStream =
+            cameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
+        val outputSizes = scalerStream?.getOutputSizes(ImageFormat.JPEG)
+
+        return getMaxOutput(outputSizes)
+    }
+
+    private fun getMaxOutput(outputSizes: Array<Size>?): Size {
+        return outputSizes?.maxByOrNull { s -> s.height + s.width }!!
+    }
+
+    fun configImageReader(size: Size) {
+        imageReader = ImageReader.newInstance(size.width, size.height, ImageFormat.JPEG, 2)
+
+        imageReader.setOnImageAvailableListener({ imgReader ->
+            val image = imgReader.acquireLatestImage()
+            val buffer = image.planes.first().buffer
+            val byteArray = ByteArray(buffer.remaining())
+            buffer.get(byteArray)
+            val fileImage = File(folderImage, "imagen1.jpeg")
+            fileImage.appendBytes(byteArray)
+        }, null)
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun reOpenCam(toggleCam: Boolean = true) {
+        if (toggleCam)
+            activeCamera = if (activeCamera == 0) 1 else 0
+
+        val idCamera = cameraManager.cameraIdList[activeCamera]
+
+        createImageReader(idCamera)
+
+        cameraManager.openCamera(idCamera, cameraDeviceCallBack, null)
+    }
+
+    val cameraDeviceCallBack = object : CameraDevice.StateCallback() {
+        override fun onOpened(camera: CameraDevice) {
+            cameraDevice = camera
+
+            val builderCapture = camera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
+            builderCapture.addTarget(surfaceHolder.surface)
+            val captureRequest = builderCapture.build()
+
+            val builderCaptureImage =
+                camera.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE)
+            builderCaptureImage.addTarget(imageReader.surface)
+            imageCapture = builderCaptureImage.build()
+
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+                camera.createCaptureSession(
+                    listOf(surfaceHolder.surface, imageReader.surface),
+                    object : CameraCaptureSession.StateCallback() {
+                        override fun onConfigured(session: CameraCaptureSession) {
+                            this@MainActivity.session = session
+                            session.setRepeatingRequest(captureRequest, null, null)
+                        }
+
+                        override fun onConfigureFailed(session: CameraCaptureSession) {}
+
+                    },
+                    null
+                )
+            } else {
+                val sessionConfiguration = SessionConfiguration(
+                    SessionConfiguration.SESSION_REGULAR,
+                    listOf(
+                        OutputConfiguration(surfaceHolder.surface),
+                        OutputConfiguration(imageReader.surface)
+                    ),
+                    executorCamera,
+                    object : CameraCaptureSession.StateCallback() {
+                        override fun onConfigured(session: CameraCaptureSession) {
+                            this@MainActivity.session = session
+                            session.setRepeatingRequest(captureRequest, null, null)
+                        }
+
+                        override fun onConfigureFailed(session: CameraCaptureSession) {}
+
+                    }
+                )
+
+                camera.createCaptureSession(sessionConfiguration)
+            }
+        }
+
+        override fun onClosed(camera: CameraDevice) {
+            if (reOpenToggle) {
+                reOpenCam()
+            }
+        }
+
+        override fun onDisconnected(camera: CameraDevice) {}
+
+        override fun onError(camera: CameraDevice, error: Int) {}
+
     }
 }
