@@ -2,7 +2,9 @@ package com.rockbass2560.mycamera
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
 import android.graphics.ImageFormat
 import android.hardware.camera2.*
 import android.hardware.camera2.params.OutputConfiguration
@@ -15,15 +17,20 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.widget.Button
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import java.io.File
+import java.io.FilenameFilter
 import java.util.concurrent.Executors
 
+const val COUNTER_IMAGE = "COUNTER_IMAGE"
+const val REQUEST_CAMERA = 10
+const val DEFAULT_SHARED_PREFERENCES = "DEFAULT_SHARED_PREFERENCES"
+
 class MainActivity : AppCompatActivity() {
-    private val REQUEST_CAMERA = 10
     private val executorCamera = Executors.newSingleThreadExecutor()
     private lateinit var session: CameraCaptureSession
     private lateinit var surfaceHolder: SurfaceHolder
@@ -34,6 +41,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var imageReader: ImageReader
     private lateinit var cameraManager: CameraManager
     private var reOpenToggle = true
+    private lateinit var imageView: ImageView
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -74,16 +82,39 @@ class MainActivity : AppCompatActivity() {
         createFolderImage()
 
         configButtons()
+
+        loadLastImage()
     }
 
-    fun createFolderImage() {
+    private fun loadLastImage() {
+        imageView = findViewById<ImageView>(R.id.lastimage_imageview)
+
+        val files = folderImage.listFiles(FilenameFilter { dir, name ->
+            name.contains("image_")
+        })
+
+        val lastFile = files?.maxByOrNull { file ->
+            val onlyName = file.name.split(".")[0]
+
+            onlyName.split("_")[1].toInt()
+        }
+
+        loadLastImage(lastFile)
+    }
+
+    private fun loadLastImage(lastFile: File?) {
+        val bitmap = BitmapFactory.decodeFile(lastFile?.absolutePath)
+        imageView.setImageBitmap(bitmap)
+    }
+
+    private fun createFolderImage() {
         folderImage = File(filesDir, "image")
         if (!folderImage.exists()) {
             folderImage.mkdir()
         }
     }
 
-    fun configButtons() {
+    private fun configButtons() {
         val flipButton = findViewById<ImageButton>(R.id.flip_button)
         flipButton.setOnClickListener {
             session.stopRepeating()
@@ -133,10 +164,11 @@ class MainActivity : AppCompatActivity() {
     fun createImageReader(idCamera: String) {
         val size = getSize(idCamera)
 
-        configImageReader(size)
+        val sharedPreferences = getSharedPreferences(DEFAULT_SHARED_PREFERENCES, 0)
+        configImageReader(size, sharedPreferences)
     }
 
-    fun getSize(idCamera: String): Size {
+    private fun getSize(idCamera: String): Size {
         val cameraCharacteristics = cameraManager.getCameraCharacteristics(idCamera)
         val scalerStream =
             cameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
@@ -149,7 +181,7 @@ class MainActivity : AppCompatActivity() {
         return outputSizes?.maxByOrNull { s -> s.height + s.width }!!
     }
 
-    fun configImageReader(size: Size) {
+    private fun configImageReader(size: Size, sharedPreferences: SharedPreferences) {
         imageReader = ImageReader.newInstance(size.width, size.height, ImageFormat.JPEG, 2)
 
         imageReader.setOnImageAvailableListener({ imgReader ->
@@ -157,8 +189,15 @@ class MainActivity : AppCompatActivity() {
             val buffer = image.planes.first().buffer
             val byteArray = ByteArray(buffer.remaining())
             buffer.get(byteArray)
-            val fileImage = File(folderImage, "imagen1.jpeg")
+
+            val counterImage = sharedPreferences.getInt(COUNTER_IMAGE, 1)
+
+            val fileImage = File(folderImage, "image_$counterImage.jpeg")
             fileImage.appendBytes(byteArray)
+
+            loadLastImage(fileImage)
+
+            sharedPreferences.edit().putInt(COUNTER_IMAGE, counterImage + 1).apply()
         }, null)
     }
 
