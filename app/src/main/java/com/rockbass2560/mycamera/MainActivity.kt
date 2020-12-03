@@ -2,6 +2,7 @@ package com.rockbass2560.mycamera
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
@@ -127,6 +128,12 @@ class MainActivity : AppCompatActivity() {
             imageCapture?.let {
                 session.capture(it, null, null)
             }
+        }
+
+        val lastImageImageView = findViewById<ImageView>(R.id.lastimage_imageview)
+        lastImageImageView.setOnClickListener {
+            val intent = Intent(this, ImagePager::class.java)
+            startActivity(intent)
         }
     }
 
