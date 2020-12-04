@@ -5,8 +5,10 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageFormat
+import android.graphics.Matrix
 import android.hardware.camera2.*
 import android.hardware.camera2.params.OutputConfiguration
 import android.hardware.camera2.params.SessionConfiguration
@@ -24,6 +26,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import java.io.File
+import java.io.FileOutputStream
 import java.io.FilenameFilter
 import java.util.concurrent.Executors
 
@@ -188,6 +191,24 @@ class MainActivity : AppCompatActivity() {
         return outputSizes?.maxByOrNull { s -> s.height + s.width }!!
     }
 
+    private fun fixImage(byteArray: ByteArray, file: File) {
+        val bitmapOriginal = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+        val matrix = Matrix()
+        matrix.preRotate(90F)
+        val bitmapFinal = Bitmap.createBitmap(
+            bitmapOriginal,
+            0,
+            0,
+            bitmapOriginal.width,
+            bitmapOriginal.height,
+            matrix,
+            true
+        )
+        FileOutputStream(file).use { stream ->
+            bitmapFinal.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+        }
+    }
+
     private fun configImageReader(size: Size, sharedPreferences: SharedPreferences) {
         imageReader = ImageReader.newInstance(size.width, size.height, ImageFormat.JPEG, 2)
 
@@ -200,7 +221,8 @@ class MainActivity : AppCompatActivity() {
             val counterImage = sharedPreferences.getInt(COUNTER_IMAGE, 1)
 
             val fileImage = File(folderImage, "image_$counterImage.jpeg")
-            fileImage.appendBytes(byteArray)
+
+            fixImage(byteArray, fileImage)
 
             loadLastImage(fileImage)
 
