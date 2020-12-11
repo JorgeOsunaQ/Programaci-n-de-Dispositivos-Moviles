@@ -15,6 +15,7 @@ import android.hardware.camera2.params.SessionConfiguration
 import android.media.ImageReader
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.util.Size
 import android.view.SurfaceHolder
 import android.view.SurfaceView
@@ -108,6 +109,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadLastImage(lastFile: File?) {
         val bitmap = BitmapFactory.decodeFile(lastFile?.absolutePath)
+        Log.d("BITMAP",lastFile?.absolutePath.toString())
         imageView.setImageBitmap(bitmap)
     }
 
